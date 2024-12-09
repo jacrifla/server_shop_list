@@ -60,4 +60,5 @@ ALTER TABLE direct_shares ADD CONSTRAINT fk_direct_shares_shopping_lists FOREIGN
 ALTER TABLE direct_shares ADD CONSTRAINT fk_direct_shares_users FOREIGN KEY (shared_with_user_id) REFERENCES users(id);
 
 
-SELECT * from shopping_lists Where user_id = 1
+SELECT * from shopping_lists Where user_id = 1;
+SELECT * FROM users
