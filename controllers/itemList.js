@@ -1,4 +1,4 @@
-const ItemList = require('../models/itemList');
+const ItemList = require('../models/itemListModel');
 
 exports.createItemList = (req, res) => {
     const { listId, name, quantity, observation } = req.body;

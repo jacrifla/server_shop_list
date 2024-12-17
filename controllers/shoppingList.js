@@ -1,4 +1,4 @@
-const ShoppingList = require('../models/shoppingList');
+const ShoppingList = require('../models/shoppingListModel');
 
 // Criar nova lista de compras
 exports.createShoppingList = (req, res) => {

@@ -1,4 +1,4 @@
-const ShareToken = require('../models/shareToken');
+const ShareToken = require('../models/shareTokenModel');
 
 exports.createToken = (req, res) => {
     const { listId, userId } = req.body; 

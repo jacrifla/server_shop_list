@@ -1,4 +1,4 @@
-const sharedListPermissionsModel = require('../models/sharedListPermission');
+const sharedListPermissionsModel = require('../models/sharedListPermissionModel');
 
 exports.addPermission = (req, res) => {
   const { listId, userId, canEdit } = req.body;
