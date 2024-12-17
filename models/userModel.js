@@ -3,7 +3,7 @@ const connection = require('../config/db');
 class User {    
     // Buscar todos os usuarios
     static getAll(callback) {
-        const query = 'SELECT * FROM users WHERE deleted_at IS NULL';
+        const query = 'SELECT id, name, email, created_at, updated_at FROM users WHERE deleted_at IS NULL';
         connection.query(query, (err, results) => {
             if (err) {
                 callback(err, null);
@@ -15,7 +15,7 @@ class User {
 
   // Buscar um usuário pelo email
     static getByEmail(email, callback) {
-        const query = 'SELECT * FROM users WHERE email = $1 AND deleted_at IS NULL';
+        const query = 'SELECT id, name, email, created_at, updated_at FROM users WHERE email = $1 AND deleted_at IS NULL';
         connection.query(query, [email], (err, result) => {
             if (err) {
                 callback(err, null);
@@ -33,7 +33,7 @@ class User {
 
     // Buscar um usuário por ID
     static getById(id, callback) {
-        const query = 'SELECT * FROM users WHERE id = $1 AND deleted_at IS NULL';
+        const query = 'SELECT id, name, email, created_at, updated_at FROM users WHERE id = $1 AND deleted_at IS NULL';
         connection.query(query, [id], (err, result) => {
             if (err) {
                 callback(err, null);
