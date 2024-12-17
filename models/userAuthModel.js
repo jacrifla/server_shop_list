@@ -10,7 +10,7 @@ class UserAuth {
             if (err) {
                 return callback(err, null);
             }
-            const query = 'INSERT INTO users (name, email, password, created_at) VALUES(?,?,?, NOW())';
+            const query = 'INSERT INTO users (name, email, password, created_at) VALUES ($1, $2, $3, CURRENT_TIMESTAMP)';
             connection.query(query, [name, email, hashedPassword], (err, result) => {
                 if (err) {
                     return callback(err, null);
@@ -36,32 +36,36 @@ class UserAuth {
 
     // Login so usuário
     static login(email, password, callback) {
-        const query = 'SELECT id, name, email, password FROM users WHERE email = ? AND deleted_at IS NULL';
+        const query = 'SELECT id, name, email, password FROM users WHERE email = $1 AND deleted_at IS NULL';
         connection.query(query, [email], (err, results) => {
             if (err) {
                 callback(err, null);
                 return;
             }
-            if (results.length === 0) {
-                callback(null, null);
+            if (results.rows.length === 0) {
+                callback(null, null); // Usuário não encontrado
                 return;
             }
-
-            const storedPassword = results[0].password;
-
+    
+            const storedPassword = results.rows[0].password;
+    
             UserAuth.verifyPassword(password, storedPassword, (err, isMatch) => {
                 if (err) {
                     return callback(err, null);
                 }
                 if (isMatch) {
-                    callback(null, { id: results[0].id, name: results[0].name, email: results[0].email });
+                    callback(null, {
+                        id: results.rows[0].id,
+                        name: results.rows[0].name,
+                        email: results.rows[0].email
+                    });
                 } else {
-                    // Senha incorreta
-                    callback(null, null);
+                    callback(null, null); // Senha incorreta
                 }
-            })
-        })
+            });
+        });
     }
+    
 
     // Redefinir a senha
     static resetPassword(email, newPassword, callback) {
@@ -70,7 +74,7 @@ class UserAuth {
                 return callback(err, null);
             }
 
-            const query = 'UPDATE users SET password = ? WHERE email = ?';
+            const query = 'UPDATE users SET password = $1 WHERE email = $2';
             connection.query(query, [hashedPassword, email], (err, results) => {
                 if (err) {
                     return callback(err, null);
