@@ -21,7 +21,7 @@ exports.getAllUsers = (req, res) => {
 
 // Buscar um usuário pelo e-mail
 exports.getUserByEmail = (req, res) => {
-    const {email} = req.body;
+    const { email } = req.body;
     
     if (!email) {
         return res.status(400).json({
@@ -49,12 +49,12 @@ exports.getUserByEmail = (req, res) => {
             message: 'Usuário buscado com sucesso!',
             data: user
         });
-    }) 
+    }); 
 };
 
 // Buscar um usuário pelo ID
 exports.getUserById = (req, res) => {
-    const {id} = req.params;
+    const { id } = req.params;
 
     User.getById(id, (err, user) => {
         if (err) {
@@ -81,7 +81,7 @@ exports.getUserById = (req, res) => {
 // Atualizar um usuário
 exports.updateUser = (req, res) => {
     const {id} = req.params;
-    const {name, email} = req.body;
+    const { name, email } = req.body;
 
     if (!name ||!email) {
         return res.status(400).json({
@@ -113,7 +113,7 @@ exports.updateUser = (req, res) => {
 
 // Deletar um usuário
 exports.deleteUser = (req, res) => {
-    const {id} = req.params;
+    const { id } = req.params;
 
     User.delete(id, (err) => {
         if (err) {
@@ -132,7 +132,7 @@ exports.deleteUser = (req, res) => {
 
 // Restaurar um usuário
 exports.restoreUser = (req, res) => {
-    const {id} = req.params;
+    const { id } = req.params;
 
     User.restore(id, (err) => {
         if (err) {

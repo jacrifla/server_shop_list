@@ -8,12 +8,12 @@ class User {
             if (err) {
                 callback(err, null);
                 return;
-            }
-            callback(null, results);
+            }          
+            callback(null, results.rows);
         })
     }
-    
-    // Buscar um usuário pelo email
+
+  // Buscar um usuário pelo email
     static getByEmail(email, callback) {
         const query = 'SELECT * FROM users WHERE email = $1 AND deleted_at IS NULL';
         connection.query(query, [email], (err, result) => {
@@ -21,13 +21,15 @@ class User {
                 callback(err, null);
                 return;
             }
-            if (result.length === 0) {
+            // Verificando o retorno correto da consulta
+            if (result.rows.length === 0) {
                 callback(null, null);
                 return;
             }
-            callback(null, result[0]);
-        })
+            callback(null, result.rows[0]);
+        });
     }
+
 
     // Buscar um usuário por ID
     static getById(id, callback) {
@@ -41,7 +43,7 @@ class User {
                 callback(null, null);
                 return;
             }
-            callback(null, result[0]);
+            callback(null, result.rows);
         })
     }
 
@@ -53,7 +55,7 @@ class User {
                 callback(err, null);
                 return;
             }
-            callback(null, results);
+            callback(null, results.rows);
         })
     }
 
@@ -65,7 +67,7 @@ class User {
                 callback(err, null);
                 return;
             }
-            callback(null, results);
+            callback(null, results.rows);
         })
     }
 
@@ -77,7 +79,7 @@ class User {
                 callback(err, null);
                 return;
             }
-            callback(null, results);
+            callback(null, results.rows);
         })
     }
     
