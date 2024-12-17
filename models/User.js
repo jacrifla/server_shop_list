@@ -1,4 +1,3 @@
-require('dotenv').config();
 const connection = require('../config/db');
 
 class User {    

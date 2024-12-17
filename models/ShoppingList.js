@@ -27,7 +27,6 @@ class ShoppingList {
 
     // Buscar lista de compras por usuario
     static getListByUserId(id, callback) {
-
         const query = 'SELECT * FROM shopping_lists WHERE user_id =? AND deleted_at IS NULL';
         connection.query(query, [id], (err, results) => {
             if (err) {

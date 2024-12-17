@@ -1,4 +1,4 @@
-const DirectShare = require('../models/DirectShare');
+const DirectShare = require('../models/directShare');
 
 class DirectShareController {
     // Criar um novo compartilhamento direto

@@ -36,11 +36,11 @@ class ItemList {
             }
 
             if (results.length === 0) {
-                return callback(null, false); // Item não encontrado
+                return callback(null, false);
             }
 
             const currentChecked = results[0].checked;
-            const newChecked = !currentChecked; // Alterna o estado
+            const newChecked = !currentChecked;
 
             const updateQuery = `UPDATE list_items SET checked = ? WHERE id = ?`;
 
@@ -48,7 +48,7 @@ class ItemList {
                 if (err) {
                     return callback(err, null);
                 }
-                callback(null, result.affectedRows > 0); // Retorna se a atualização foi bem-sucedida
+                callback(null, result.affectedRows > 0);
             });
         });
     }
@@ -84,7 +84,7 @@ class ItemList {
         });
     }
 
-    // Deletar um item (soft delete)
+    // Deletar um item
     static delete(id, callback) {
         const query = `UPDATE list_items SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?`;
         connection.query(query, [id], (err, result) => {

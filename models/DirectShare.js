@@ -1,7 +1,7 @@
 const connection = require("../config/db");
 
 class DirectShare {
-    // Criar um novo compartilhamento direto
+    // Criar um novo compartilhamento direto 
     static create({ listId, sharedWithUserId, permission }, callback) {
         const query = 'INSERT INTO direct_shares (list_id, shared_with_user_id, permission, created_at) VALUES (?, ?, ?, NOW())';
         connection.query(query, [listId, sharedWithUserId, permission], (err, results) => {

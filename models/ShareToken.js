@@ -46,7 +46,7 @@ const ShareToken = {
                 return callback(null, { valid: false, message: 'Token não encontrado ou expirado' });
             }
     
-            const tokenData = rows[0]; // Supondo que estamos recebendo uma linha do banco
+            const tokenData = rows[0];
             if (new Date(tokenData.expires_at) < new Date()) {
                 return callback(null, { valid: false, message: 'Token expirado' });
             }

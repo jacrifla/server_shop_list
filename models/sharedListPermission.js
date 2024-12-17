@@ -7,9 +7,9 @@ const SharedListPermission = {
     
     connection.query(query, [listId, userId, canEdit], (err, result) => {
       if (err) {
-        return callback(err, null);  // Chama o callback com o erro, se houver
+        return callback(err, null);
       }
-      callback(null, { id: result.insertId, listId, userId, canEdit });  // Chama o callback com o sucesso
+      callback(null, { id: result.insertId, listId, userId, canEdit });
     });
   },
 
