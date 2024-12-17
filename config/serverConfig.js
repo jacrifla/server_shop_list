@@ -6,7 +6,11 @@ module.exports = (app) => {
     app.use(cors({
         origin: function (origin, callback) {
             // Lista de domínios permitidos
-            const allowedOrigins = ['http://localhost:3000', 'https://api-shop-server-c62ad5afaeaa.herokuapp.com'];
+            const allowedOrigins = [
+                'http://localhost:3000', 
+                'https://api-shop-server-c62ad5afaeaa.herokuapp.com',
+                'https://shoplistmom.netlify.app'
+            ];
             if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
                 // Permite a origem se estiver na lista ou se não houver origem (caso de requisições do servidor)
                 callback(null, true);
@@ -18,7 +22,9 @@ module.exports = (app) => {
         // Métodos permitidos
         methods: 'GET, POST, PUT, DELETE',
         // Cabeçalhos permitidos
-        allowedHeaders: 'Content-Type, Authorization'
+        allowedHeaders: 'Content-Type, Authorization',
+        // Permite o envio de cookies, se necessário
+        credentials: true,
     }));
 
     app.use(express.json());
