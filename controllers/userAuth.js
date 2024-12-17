@@ -16,7 +16,7 @@ exports.createUser = (req, res) => {
             console.error(`Erro ao criar usuário: ${err.message}`);
             return res.status(500).json({
                 success: false,
-                message: 'Erro ao criar usuário'
+                message: `Erro ao criar usuário. ${err.message}`
             });
         }
         res.status(201).json({
