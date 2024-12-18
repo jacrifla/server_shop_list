@@ -6,14 +6,14 @@ class ShoppingList {
         const query = `
             INSERT INTO shopping_lists (user_id, name, created_at) 
             VALUES ($1, $2, CURRENT_TIMESTAMP) 
-            RETURNING id;
+            RETURNING id, created_at;
         `;
         connection.query(query, [userId, name], (err, results) => {
             if (err) {
                 callback(err, null);
                 return;
             }
-            callback(null, { id: results.rows[0].id, userId, name });
+            callback(null, { id: results.rows[0].id, userId, name, creationDate: results.rows[0].created_at });
         });
     }
 
