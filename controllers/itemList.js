@@ -29,7 +29,7 @@ exports.createItemList = (req, res) => {
 
 // Obter todos os itens de uma lista
 exports.getItemsByList = (req, res) => {
-    const { listId } = req.query;
+    const { listId } = req.params;
 
     if (!listId) {
         return res.status(400).json({ 
