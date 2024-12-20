@@ -4,6 +4,7 @@ const itemListRoutes = require('../routes/itemListRoutes');
 const directShareRoutes = require('../routes/directShareRoutes');
 const shareTokenRoutes = require('../routes/shareTokenRoutes');
 const sharedListPermissionsRoutes = require('../routes/sharedListPermissionsRoutes');
+const categoryRoutes = require('../routes/categoryRoutes');
 
 module.exports = (app) => {
     app.use('/users', userRoutes);
@@ -12,4 +13,5 @@ module.exports = (app) => {
     app.use('/shared-list', sharedListPermissionsRoutes);
     app.use('/direct-shares', directShareRoutes);
     app.use('/share-tokens', shareTokenRoutes);
+    app.use('/category', categoryRoutes)
 };
