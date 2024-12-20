@@ -16,4 +16,7 @@ router.delete('/delete/:id', itemListController.deleteItem);
 
 router.put('/toggle-check', itemListController.toggleCheck);
 
+// Rota para deletar lista e os itens
+router.delete('/delete-with-items/:listId', itemListController.deleteListWithItems);
+
 module.exports = router;

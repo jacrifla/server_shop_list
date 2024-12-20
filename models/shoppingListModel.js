@@ -13,7 +13,7 @@ class ShoppingList {
                 callback(err, null);
                 return;
             }
-            callback(null, { id: results.rows[0].id, userId, name, creationDate: results.rows[0].created_at });
+            callback(null, { id: results.rows[0].id, userId, name, created_at: results.rows[0].created_at });
         });
     }
 
@@ -43,7 +43,7 @@ class ShoppingList {
 
     // Deletar lista de compras por ID
     static deleteById(id, callback) {
-        const query = 'DELETE FROM shopping_lists WHERE id = $1';
+        const query = 'UPDATE shopping_lists SET deleted_at = CURRENT_TIMESTAMP WHERE id = $1';
         connection.query(query, [id], (err, results) => {
             if (err) {
                 callback(err, null);
@@ -74,13 +74,13 @@ class ShoppingList {
         const query = `
             SELECT a.* 
             FROM shopping_lists a
-            WHERE a.user_id = $1 
+            WHERE a.user_id = $1 AND a.deleted_at IS NULL
             UNION
             SELECT a.* 
             FROM shopping_lists a
             JOIN shared_list_permissions b 
             ON a.id = b.list_id 
-            WHERE b.user_id = $1;
+            WHERE b.user_id = $1 AND a.deleted_at IS NULL;
         `;
         connection.query(query, [userId], (err, results) => {
             if (err) {
