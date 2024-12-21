@@ -1,4 +1,5 @@
 const CategoriesModel = require('../models/categoriesModel');
+
 exports.createCategory = async (req, res) => {
     try {
         const { name, description } = req.body;
@@ -41,7 +42,7 @@ exports.findAllCategory = async (req, res) => {
 exports.findById = async (req, res) => {
     try {
         const { id } = req.params;
-        const category = await CategoriesModel.findById(id);
+        const category = await CategoriesModel.findById({id});
         if (!category) {
             return res.status(404).json({
                 success: false,
@@ -63,7 +64,7 @@ exports.findById = async (req, res) => {
 exports.deleteCategory = async (req, res) => {
     try {
         const { id } = req.params;
-        const rowCount  = await CategoriesModel.delete(id);
+        const rowCount  = await CategoriesModel.delete({id});
         if (rowCount === 0) {
             return res.status(404).json({
                 success: false,

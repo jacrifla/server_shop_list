@@ -16,7 +16,7 @@ exports.createDirectShare = async (req, res) => {
         });
     };
     const finalPermission = permission || 'view';
-    const share = DirectShare.create({listId, sharedWithUserId, finalPermission});
+    const share = await DirectShare.create({listId, sharedWithUserId, finalPermission});
     res.json({
         success: true,
         message: 'Compartilhamento criado com sucesso',

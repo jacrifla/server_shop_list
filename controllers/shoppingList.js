@@ -1,6 +1,5 @@
 const ShoppingList = require('../models/shoppingListModel');
 
-// Criar nova lista de compras
 exports.createList = async (req, res) => {
     try {
         const { userId, name } = req.body;
@@ -24,7 +23,6 @@ exports.createList = async (req, res) => {
     }
 };
 
-// Buscar todas as listas de compras
 exports.findAllLists = async (req, res) => {
     try {
         const list = await ShoppingList.findAll();

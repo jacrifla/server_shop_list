@@ -18,14 +18,14 @@ const Categories = {
         return result.rows;
     },
 
-    findById: async (id) => {
+    findById: async ({id}) => {
         const query = 'SELECT * FROM categories WHERE id = $1';
         const values = [id];
         const result = await connection.query(query, values);
         return result.rows[0];
     },
 
-    delete: async (id) => {
+    delete: async ({id}) => {
         const query = 'DELETE FROM categories WHERE id = $1'
         const values = [id];
         const result = await connection.query(query, values);
