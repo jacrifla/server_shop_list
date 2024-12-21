@@ -1,94 +1,64 @@
 const connection = require('../config/db');
 
-class ShoppingList {
-    // Criar Lista de compras
-    static create({ userId, name }, callback) {
+const ShoppingList = {
+    create: async ({userId, name}) => {
         const query = `
-            INSERT INTO shopping_lists (user_id, name, created_at) 
-            VALUES ($1, $2, CURRENT_TIMESTAMP) 
-            RETURNING id, created_at;
-        `;
-        connection.query(query, [userId, name], (err, results) => {
-            if (err) {
-                callback(err, null);
-                return;
-            }
-            callback(null, { id: results.rows[0].id, userId, name, created_at: results.rows[0].created_at });
-        });
-    }
+            INSERT INTO shopping_lists (user_id, name, created_at)
+            VALUES ($1, $2, CURRENT_TIMESTAMP)
+            RETURNING *;
+        `
+        const values = [userId, name];
+        const result = await connection.query(query, values);
+        return result.rows[0];
+    },
 
-    // Buscar todas as listas de compras
-    static getAll(callback) {
+    findAll: async () => {
         const query = 'SELECT * FROM shopping_lists WHERE deleted_at IS NULL';
-        connection.query(query, (err, results) => {
-            if (err) {
-                callback(err, null);
-                return;
-            }
-            callback(null, results.rows);
-        });
-    }
+        const result = await connection.query(query);
+        return result.rows;
+    },
 
-    // Buscar lista de compras por usuario
-    static getListByUserId(id, callback) {
+    findListByUserId: async ({userId}) => {
         const query = 'SELECT * FROM shopping_lists WHERE user_id = $1 AND deleted_at IS NULL';
-        connection.query(query, [id], (err, results) => {
-            if (err) {
-                callback(err, null);
-                return;
-            }
-            callback(null, results.rows);
-        });
-    }
+        const values = [userId];
+        const result = await connection.query(query, values);
+        return result.rows;
+    },
 
-    // Deletar lista de compras por ID
-    static deleteById(id, callback) {
+    delete: async ({listId}) => {
         const query = 'UPDATE shopping_lists SET deleted_at = CURRENT_TIMESTAMP WHERE id = $1';
-        connection.query(query, [id], (err, results) => {
-            if (err) {
-                callback(err, null);
-                return;
-            }
-            callback(null, results.rowCount); // PostgreSQL usa rowCount
-        });
-    }
+        const values = [listId];
+        const result = await connection.query(query, values);
+        return result.rowCount;
+    },
 
-    // Compartilhar uma lista de compras
-    static shareList({ listId, userId }, callback) {
+    findListWithPermission: async ({userId}) => {
         const query = `
-            INSERT INTO shared_lists (list_id, user_id, shared_at) 
-            VALUES ($1, $2, CURRENT_TIMESTAMP) 
-            RETURNING id;
-        `;
-        connection.query(query, [listId, userId], (err, results) => {
-            if (err) {
-                callback(err, null);
-                return;
-            }
-            callback(null, { sharedId: results.rows[0].id, listId, userId });
-        });
-    }
-
-    // Obter listas com permissões compartilhadas
-    static getListWithPermission(userId, callback) {
-        const query = `
-            SELECT a.* 
+            SELECT a.*
             FROM shopping_lists a
             WHERE a.user_id = $1 AND a.deleted_at IS NULL
             UNION
-            SELECT a.* 
+            SELECT a.*
             FROM shopping_lists a
-            JOIN shared_list_permissions b 
-            ON a.id = b.list_id 
+            JOIN shared_list_permissions b
+            ON a.id = b.list_id
             WHERE b.user_id = $1 AND a.deleted_at IS NULL;
         `;
-        connection.query(query, [userId], (err, results) => {
-            if (err) {
-                callback(err, null);
-                return;
-            }
-            callback(null, results.rows);
-        });
+        const values = [userId];
+        const result = await connection.query(query, values);
+        return result.rows;
+    },
+
+    update: async ({name, listId}) => {
+        const query = `
+            UPDATE shopping_lists 
+            SET name = $1, updated_at = CURRENT_TIMESTAMP
+            WHERE id = $2 AND deleted_at IS NULL
+            RETURNING *
+        `;
+        const values = [name, listId];
+        const result = await connection.query(query, values);
+        return result.rows[0];
     }
 }
 
