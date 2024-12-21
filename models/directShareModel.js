@@ -1,4 +1,5 @@
 const connection = require("../config/db");
+
 const DirectShare = {
     create: async ({ listId, sharedWithUserId, permission }) => {
         const query = `
