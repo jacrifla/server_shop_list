@@ -1,113 +1,97 @@
 const DirectShare = require('../models/directShareModel');
 
-class DirectShareController {
-    // Criar um novo compartilhamento direto
-    static create(req, res) {
+exports.createDirectShare = async (req, res) => {
+    try {
         const { listId, sharedWithUserId, permission } = req.body;
-    
-        // Verificar se todos os campos obrigatórios estão presentes
-        if (!listId || !sharedWithUserId) {
-            return res.status(400).json({
-                success: false,
-                message: 'listId e sharedWithUserId são obrigatórios'
-            });
-        }
-    
-        // Verificar se o 'permission' é válido (pode ser 'view' ou 'edit')
-        if (permission && !['view', 'edit'].includes(permission)) {
-            return res.status(400).json({
-                success: false,
-                message: 'Permission deve ser "view" ou "edit"'
-            });
-        }
-    
-        // Definir valor padrão para 'permission' se não for fornecido
-        const finalPermission = permission || 'view';
-    
-        // Criar a entrada na tabela 'direct_shares'
-        DirectShare.create({ listId, sharedWithUserId, permission: finalPermission }, (err, result) => {
-            if (err) {
-                return res.status(500).json({
-                    success: false,
-                    message: err.message
-                });
-            }
-    
-            res.status(201).json({
-                success: true,
-                message: 'Compartilhamento criado com sucesso',
-                data: result
-            });
+    if (!listId || !sharedWithUserId) {
+        return res.status(400).json({
+            success: false,
+            message: 'É necessário enviar o ID da lista de compras e o ID do usuário que será compartilhado.'
         });
+    };
+    if (permission &&!['view', 'edit'].includes(permission)) {
+        return res.status(400).json({
+            success: false,
+            message: 'Permission deve ser "view" ou "edit"'
+        });
+    };
+    const finalPermission = permission || 'view';
+    const share = DirectShare.create({listId, sharedWithUserId, finalPermission});
+    res.json({
+        success: true,
+        message: 'Compartilhamento criado com sucesso',
+        data: share
+    });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        })
     }
-    
+};
 
-    // Buscar compartilhamentos diretos por ID da lista
-    static getByListId(req, res) {
+exports.findListById = async (req, res) => {
+    try {
         const { listId } = req.params;
-
-        DirectShare.getByListId(listId, (err, results) => {
-            if (err) {
-                return res.status(500).json({
-                    success: false,
-                    message: err.message
-                });
-            }
-            if (results.length === 0) {
-                return res.status(404).json({ message: 'Nenhum compartilhamento encontrado' });
-            }
-            res.status(200).json({ data: results });
-        });
+        const directShares = await DirectShare.findListById({listId});
+        if (directShares.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: 'Nenhum compartilhamento encontrado'
+            });
+        };
+        res.json({
+            success: true,
+            data: directShares
+        })
+    } catch (error) {
+        res.json({
+            success: false,
+            message: error.message
+        })
     }
+};
 
-    // Buscar compartilhamentos diretos por ID do usuário
-    static getByUserId(req, res) {
+exports.findListByUserId = async (req, res) => {
+    try {
         const { userId } = req.params;
-
-        DirectShare.getByUserId(userId, (err, results) => {
-            if (err) {
-                return res.status(500).json({ 
-                    success: false,
-                    message: err.message
-                });
-            }
-            if (results.length === 0) {
-                return res.status(404).json({
-                    success: false,
-                    message: 'Nenhum compartilhamento encontrado'
-                });
-            }
-            res.status(200).json({
-                success: true,
-                message: 'Compartilhamentos encontrados', 
-                data: results
+        const directShares = await DirectShare.findListByUserId({userId});
+        if (directShares.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: 'Nenhum compartilhamento encontrado'
             });
-        });
+        };
+        res.json({
+            success: true,
+            data: directShares
+        })
+    } catch (error) {
+        res.json({
+            success: false,
+            message: error.message
+        })
     }
+};
 
-    // Deletar um compartilhamento direto por ID
-    static deleteById(req, res) {
+exports.deleteDirectShare = async (req, res) => {
+    try {
         const { id } = req.params;
-
-        DirectShare.deleteById(id, (err, affectedRows) => {
-            if (err) {
-                return res.status(500).json({
-                    success: false,
-                    message: err.message
-                });
-            }
-            if (affectedRows === 0) {
-                return res.status(404).json({
-                    success: false,
-                    message: 'Nenhum compartilhamento encontrado' 
-                });
-            }
-            res.status(200).json({
-                success: true,
-                message: 'Compartilhamento deletado com sucesso' 
+        const deletedRows = await DirectShare.delete({id});
+        if (deletedRows === 0) {
+            return res.status(404).json({
+                success: false,
+                message: 'Nenhum compartilhamento encontrado'
             });
-        });
+        };
+        res.json({
+            success: true,
+            message: 'Compartilhamento deletado com sucesso'
+        })
+    } catch (error) {
+        res.json({
+            success: false,
+            message: error.message
+        })
     }
-}
-
-module.exports = DirectShareController;
+};
