@@ -1,184 +1,341 @@
 const User = require('../models/userModel');
+const { isValidEmail } = require('../utils/validation');
 
-
-// Buscar todos os usuários
-exports.getAllUsers = (req, res) => {
-    User.getAll((err, users) => {
-        if(err) {
-            console.error(`Erro ao buscar usuários: ${err.message}`);
-            return res.status(500).json({
+exports.createUser = async (req, res) => {
+    try {
+        const { name, email, password } = req.body;
+        
+        if (!name ||!email ||!password) {
+            return res.status(400).json({
                 success: false,
-                message: 'Erro ao buscar usuários'
+                message: 'Todos os campos são obrigatórios.'
             });
-        }
+        };
+        
+        if (!isValidEmail(email)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Formato de e-mail inválido.',
+            });
+        };
+
+        const userExists = await User.findByEmail({email});
+        
+        if (userExists) {
+            return res.status(400).json({
+                success: false,
+                message: 'E-mail já cadastrado.'
+            });
+        };
+
+        const newUser = await User.create({name, email, password});
+
         res.json({
             success: true,
-            message: 'Usuários buscados com sucesso!',
+            message: 'Usuário criado com sucesso.',
+            data: newUser
+        });
+        
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        })
+    }
+};
+
+exports.findAllUsers = async (req, res) => {
+    try {
+        const users = await User.findAll();
+        res.json({
+            success: true,
             data: users
         });
-    })
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        })
+    }
 };
 
-// Buscar um usuário pelo e-mail
-exports.getUserByEmail = (req, res) => {
-    const { email } = req.body;
-    
-    if (!email) {
-        return res.status(400).json({
-            success: false,
-            message: 'E-mail é obrigatório'
-        });
-    }
-
-    User.getByEmail(email, (err, user) => {
-        if (err) {
-            console.error(`Erro ao buscar usuário: ${err.message}`);
-            return res.status(500).json({
+exports.findUserByEmail = async (req, res) => {
+    try {
+        const {email} = req.body;
+        
+        if (!email) {
+            return res.status(400).json({
                 success: false,
-                message: 'Erro ao buscar usuário'
+                message: 'E-mail é obrigatório'
+            });
+        };
+        
+        if (!isValidEmail(email)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Formato de e-mail inválido.',
             });
         }
+
+        const user = await User.findByEmail({email});
+        
         if (!user) {
             return res.status(404).json({
                 success: false,
                 message: 'Usuário não encontrado'
             });
         }
+        
         res.json({
             success: true,
-            message: 'Usuário buscado com sucesso!',
             data: user
         });
-    }); 
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        })
+    }
 };
 
-// Buscar um usuário pelo ID
-exports.getUserById = (req, res) => {
-    const { id } = req.params;
-
-    User.getById(id, (err, user) => {
-        if (err) {
-            console.error(`Erro ao buscar usuário: ${err.message}`);
-            return res.status(500).json({
+exports.findById = async (req, res) => {
+    try {
+        const {userId} = req.params;
+        
+        if (!userId) {
+            return res.status(400).json({
                 success: false,
-                message: 'Erro ao buscar usuário'
+                message: 'ID do usuário é obrigatório.'
             });
-        }
+        };
+        
+        const user = await User.findById({userId});
+        
         if (!user) {
             return res.status(404).json({
                 success: false,
                 message: 'Usuário não encontrado'
             });
-        }
+        };
+        
         res.json({
             success: true,
-            message: 'Usuário buscado com sucesso!',
             data: user
-        });	
-    })
-};
-
-// Atualizar um usuário
-exports.updateUser = (req, res) => {
-    const {id} = req.params;
-    const { name, email } = req.body;
-
-    if (!name ||!email) {
-        return res.status(400).json({
+        });
+    } catch (error) {
+        res.status(500).json({
             success: false,
-            message: 'Nome e e-mail são obrigatórios'
+            message: error.message
         });
     }
+};
 
-    User.update(id, {name, email}, (err, user) => {
-        if (err) {
-            console.error(`Erro ao atualizar usuário: ${err.message}`);
-            return res.status(500).json({
+exports.updateUser = async (req, res) => {
+    try {
+        const {userId} = req.params;
+        const { name, email } = req.body;
+        
+        if (!userId) {
+            return res.status(400).json({
                 success: false,
-                message: 'Erro ao atualizar usuário'
+                message: 'ID do usuário é obrigatório.'
+            });
+        };
+
+        if (!name && !email) {
+            return res.status(400).json({
+                success: false,
+                message: 'Nome ou e-mail são obrigatórios para atualização.'
             });
         }
+
+        if (email && !isValidEmail(email)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Formato de e-mail inválido.'
+            });
+        }
+        const rowCount = await User.update({ userId, name, email });
+
+        if (rowCount === 0) {
+            return res.status(404).json({
+                success: false,
+                message: 'Usuário não encontrado ou já excluído.'
+            });
+        }
+
+        res.json({
+            success: true,
+            message: 'Usuário atualizado com sucesso.'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Erro ao atualizar usuário'
+        });
+    }
+};
+
+exports.deleteUser = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        
+        if (!userId) {
+            return res.status(400).json({
+                success: false,
+                message: 'ID do usuário é obrigatório.'
+            });
+        };
+
+        const user = await User.delete({userId});
+        
         if (!user) {
             return res.status(404).json({
                 success: false,
-                message: 'Usuário não encontrado'
+                message: 'Usuário não encontrado ou já excluído.'
             });
-        }
-        res.json({
-            success: true,
-            message: 'Usuário atualizado com sucesso!',
-        });
-    })
-}
-
-// Deletar um usuário
-exports.deleteUser = (req, res) => {
-    const { id } = req.params;
-
-    User.delete(id, (err) => {
-        if (err) {
-            console.error(`Erro ao deletar usuário: ${err.message}`);
-            return res.status(500).json({
-                success: false,
-                message: 'Erro ao deletar usuário'
-            });
-        }
+        };
+        
         res.json({
             success: true,
             message: 'Usuário deletado com sucesso!'
         });
-    })
-}
+        
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Erro ao deletar usuário'
+        });
+    }
+};
 
-// Restaurar um usuário
-exports.restoreUser = (req, res) => {
-    const { id } = req.params;
-
-    User.restore(id, (err) => {
-        if (err) {
-            console.error(`Erro ao restaurar usuário: ${err.message}`);
-            return res.status(500).json({
+exports.restoreUser = async (req, res) => {
+    try {
+        const { email } = req.body;
+        
+        if (!email) {
+            return res.status(400).json({
                 success: false,
-                message: 'Erro ao restaurar usuário'
+                message: 'ID do usuário é obrigatório.'
             });
-        }
+        };
+
+        const user = await User.restore({email});
+        
+        if (user === 0) {
+            return res.status(404).json({
+                success: false,
+                message: 'Usuário não encontrado ou já restaurado.'
+            });
+        };
+        
         res.json({
             success: true,
             message: 'Usuário restaurado com sucesso!'
         });
-    })
-}
-
-// Buscar todas as mensagens de um usuário pelo ID
-exports.getMessages = (req, res) => {
-    const { userId } = req.params;
-
-    if (!userId) {
-        return res.status(400).json({
+        
+    } catch (error) {
+        res.status(500).json({
             success: false,
-            message: 'ID do usuário é obrigatório'
+            message: error.message
         });
     }
+};
 
-    User.getMessages(userId, (err, messages) => {
-        if (err) {
-            console.error(`Erro ao buscar mensagens: ${err.message}`);
-            return res.status(500).json({
+exports.loginUser = async (req, res) => {
+    try {
+        const {email, password} = req.body;
+        
+        if (!email ||!password) {
+            return res.status(400).json({
                 success: false,
-                message: 'Erro ao buscar mensagens',
-                error: err.message
+                message: 'Todos os campos são obrigatórios'
+            });
+        };
+        
+        const { user, token } = await User.login({ email, password });
+        
+        if (!user) {
+            return res.status(401).json({
+                success: false,
+                message: 'E-mail ou senha inválidos.'
             });
         }
-        if (messages.length === 0) {
-            return res.status(404).json({
-                success: false,
-                message: 'Nenhuma mensagem encontrada para este usuário'
-            });
-        }
+
         res.json({
             success: true,
-            message: 'Mensagens buscadas com sucesso!',
-            data: messages
+            user,
+            token,
         });
-    });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
+exports.resetPassword = async (req, res) => {
+    try {
+        const { email, newPassword } = req.body;
+
+        if (!email || !newPassword) {
+            return res.status(400).json({
+                success: false,
+                message: 'Todos os campos são obrigatórios'
+            });
+        }
+
+        const user = await User.resetPassword({ email, newPassword });
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'Usuário não encontrado.'
+            });
+        }
+
+        res.json({
+            success: true,
+            message: 'Senha alterada com sucesso.'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
+
+exports.findShareTokensForUser = (req, res) => {
+    try {
+        const { userId } = req.params;
+        
+        if (!userId) {
+            return res.status(400).json({
+                success: false,
+                message: 'ID do usuário é obrigatório'
+            });
+        };
+
+        const user = User.findShareTokensForUser({ userId });
+        
+        if (!user || user.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: 'Nenhum token de compartilhamento encontrado para o usuário'
+            });
+        }
+
+        res.json({
+            success: true,
+            data: user
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });    
+    }
 };
