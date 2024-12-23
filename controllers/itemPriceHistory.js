@@ -4,7 +4,7 @@ exports.createItemPriceHistory = async (req, res) => {
     const {itemId, price, quantity, unit, barcode } = req.body;
 
     try {
-        if (!itemId || !price || !quantity || !unit || !barcode) {
+        if (!itemId || !price || !quantity || !unit) {
             return res.status(400).json({
                 success: false,
                 message: 'Todos os campos são obrigatórios.',
