@@ -67,7 +67,7 @@ const ItemList = {
         if (setFields.length === 0) {
             throw new Error('Nenhum campo a ser atualizado');
         }
-        query += ' ' + setFields.join(', ') + ' WHERE id = $' + (values.length + 1);
+        query += ' ' + setFields.join(', ') + ' WHERE id = $' + (values.length + 1) + ' RETURNING *';
         values.push(itemId);
         
         const result = await connection.query(query, values);

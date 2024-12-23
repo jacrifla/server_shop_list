@@ -109,6 +109,7 @@ exports.updateItem = async (req, res) => {
         }
 
         const item = await ItemListModel.update({name, observation, categoryId, itemId});
+        
         res.json({
             success: true,
             data: item
