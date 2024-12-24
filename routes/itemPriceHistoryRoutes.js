@@ -7,5 +7,6 @@ router.get('/all', itemPriceHistoryController.findAllItemPriceHistory);
 router.get('/:itemId', itemPriceHistoryController.findItemPriceHistoryByItemId);
 router.put('/update/:id', itemPriceHistoryController.updateItemPriceHistory);
 router.delete('/delete/:id', itemPriceHistoryController.deleteItemPriceHistory);
+router.get('/', itemPriceHistoryController.findAllWithNameItem);
 
 module.exports = router;
